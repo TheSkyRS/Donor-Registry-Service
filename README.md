@@ -22,9 +22,9 @@ This repository implements **Microservice 1: Donor Registry**, one of three serv
 
 | Service | Description |
 |----------|--------------|
-| **MS1 – Donor Registry (this repo)** | Donor/Organ/Consent |
+| [**MS1 – Donor Registry (this repo)**](https://github.com/TheSkyRS/Donor-Registry-Service) | Donor/Organ/Consent |
 | [**MS2 – Recipient Waitlist**](https://github.com/zl3508/recipient-waitlist-service) | Recipient/Hospital/Need |
-| **MS3 – Organ Matching & Notification** | API‑first with Swagger |
+| [**MS3 – Organ Matching & Notification**](https://github.com/AyalYakobe/matchmaking_and_notifications_serivce) | API‑first with Swagger |
 
 ### Typical Flow
 
