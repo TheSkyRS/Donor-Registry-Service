@@ -1,0 +1,63 @@
+### Health
+GET http://localhost:8000/health
+
+### Health with path echo
+GET http://localhost:8000/health/hello?echo=world
+
+
+### Donors (501 expected)
+GET http://localhost:8000/donors
+
+### Create donor (501 expected)
+POST http://localhost:8000/donors
+Content-Type: application/json
+
+{
+  "full_name": "Alice Lee",
+  "dob": "1990-05-10",
+  "blood_type": "O+",
+  "status": "active"
+}
+
+### Get donor by ID (replace UUID)
+GET http://localhost:8000/donors/7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77
+
+
+### Organs (501 expected)
+GET http://localhost:8000/organs
+
+### List organs for donor (replace donor UUID)
+GET http://localhost:8000/donors/7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77/organs
+
+### Create organ for donor (501 expected)
+POST http://localhost:8000/donors/7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77/organs
+Content-Type: application/json
+
+{
+  "organ_type": "kidney",
+  "condition": "viable",
+  "retrieved_at": "2025-01-15T08:30:00Z"
+}
+
+### Get organ by ID (replace UUID)
+GET http://localhost:8000/organs/3a7f4c9e-5f0a-44f6-9f7e-1d2b3c4d5e6f
+
+
+### Consents (501 expected)
+GET http://localhost:8000/consents
+
+### List consents for donor (replace donor UUID)
+GET http://localhost:8000/donors/7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77/consents
+
+### Create consent for donor (501 expected)
+POST http://localhost:8000/donors/7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77/consents
+Content-Type: application/json
+
+{
+  "scope": "all organs",
+  "status": "granted",
+  "signed_at": "2025-02-10T09:15:00Z"
+}
+
+### Get consent by ID (replace UUID)
+GET http://localhost:8000/consents/2a4b01f7-5f5e-4a0a-8e0c-1a2b3c4d5e6f
