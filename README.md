@@ -177,6 +177,7 @@ All endpoints are defined and documented; they currently respond with HTTP `501 
   - `scope: str` (e.g. "all organs" or "specific organs")
   - `status: ConsentStatus = pending`
   - `signed_at?: datetime`
+  - `revoked_at?: datetime`
 - **ConsentCreate** = ConsentBase  
 - **ConsentRead** = ConsentBase + `id: UUID`, `donor_id: UUID`, `created_at`, `updated_at`
 - **ConsentUpdate** — all fields optional
