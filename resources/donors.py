@@ -30,8 +30,9 @@ from models import (
 from models.enums import BloodType, CommonStatus
 from services.donors_service import DonorService
 from db.session import get_db
-from utils.responses import not_implemented
 
+from services.organs_service import OrganService, DonorNotFoundError as OrganDonorNotFoundError
+from services.consents_service import ConsentService, DonorNotFoundError as ConsentDonorNotFoundError
 
 router = APIRouter(prefix="/donors", tags=["donors"])
 
@@ -42,6 +43,12 @@ router = APIRouter(prefix="/donors", tags=["donors"])
 
 def get_donor_service(db: Session = Depends(get_db)) -> DonorService:
     return DonorService(db)
+
+def get_organ_service(db: Session = Depends(get_db)) -> OrganService:
+    return OrganService(db)
+
+def get_consent_service(db: Session = Depends(get_db)) -> ConsentService:
+    return ConsentService(db)
 
 
 def make_etag(donor: DonorRead) -> str:
@@ -230,15 +237,44 @@ async def delete_donor(
 # ----------------------
 
 @router.get("/{donor_id}/organs", response_model=list[OrganRead])
-async def list_organs_for_donor(donor_id: UUID = Path(...)):
-    """List all organs belonging to a specific donor."""
-    return not_implemented()
+async def list_organs_for_donor(
+    donor_id: UUID = Path(...),
+    service: OrganService = Depends(get_organ_service),
+):
+    """
+    List all organs belonging to a specific donor.
+
+    No pagination.
+    """
+    organs, _total = service.list_organs(
+        donor_id=donor_id,
+        limit=1000,
+        offset=0,
+    )
+    return organs
 
 
-@router.post("/{donor_id}/organs", response_model=OrganRead, status_code=status.HTTP_201_CREATED)
-async def create_organ_for_donor(donor_id: UUID, o: OrganCreate):
-    """Create a new organ record for a specific donor."""
-    return not_implemented()
+@router.post(
+    "/{donor_id}/organs",
+    response_model=OrganRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_organ_for_donor(
+    donor_id: UUID,
+    o: OrganCreate,
+    service: OrganService = Depends(get_organ_service),
+):
+    """
+    Create a new organ record for a specific donor.
+    """
+    try:
+        created = service.create_organ_for_donor(donor_id, o)
+    except OrganDonorNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Donor {donor_id} not found",
+        )
+    return created
 
 
 # ----------------------
@@ -246,12 +282,40 @@ async def create_organ_for_donor(donor_id: UUID, o: OrganCreate):
 # ----------------------
 
 @router.get("/{donor_id}/consents", response_model=list[ConsentRead])
-async def list_consents_for_donor(donor_id: UUID = Path(...)):
-    """List all consent records for a specific donor."""
-    return not_implemented()
+async def list_consents_for_donor(
+    donor_id: UUID = Path(...),
+    service: ConsentService = Depends(get_consent_service),
+):
+    """
+    List all consent records for a specific donor.
+    """
+    consents, _total = service.list_consents(
+        donor_id=donor_id,
+        limit=1000,
+        offset=0,
+    )
+    return consents
 
 
-@router.post("/{donor_id}/consents", response_model=ConsentRead, status_code=status.HTTP_201_CREATED)
-async def create_consent_for_donor(donor_id: UUID, c: ConsentCreate):
-    """Create a new consent record for a donor."""
-    return not_implemented()
+@router.post(
+    "/{donor_id}/consents",
+    response_model=ConsentRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_consent_for_donor(
+    donor_id: UUID,
+    c: ConsentCreate,
+    service: ConsentService = Depends(get_consent_service),
+):
+    """
+    Create a new consent record for a donor.
+    """
+    try:
+        created = service.create_for_donor(donor_id, c)
+    except ConsentDonorNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Donor {donor_id} not found",
+        )
+    return created
+
