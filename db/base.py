@@ -6,7 +6,8 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "mysql+pymysql://yl5763:yl5763@localhost:3306/donor_registry"
+    # "mysql+pymysql://yl5763:yl5763@localhost:3306/donor_registry"
+    "mysql+pymysql://root:yl5763@35.188.28.63:3306/donor_registry"
 )
 
 engine = create_engine(

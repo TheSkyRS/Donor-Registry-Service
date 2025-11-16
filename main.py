@@ -14,7 +14,5 @@ if __name__ == "__main__":
     from db.base import Base, engine
     # for test, automatically create table (if not exists)
     Base.metadata.create_all(bind=engine)
-    port = int(os.environ.get("FASTAPIPORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
-
-
+    port = int(os.environ.get("PORT", 8080))  # Cloud Run uses PORT
+    uvicorn.run("main:app", host="0.0.0.0", port=port)

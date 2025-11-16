@@ -10,11 +10,25 @@ Sprint 1 delivered full API stubs (HTTP 501, OpenAPI ready).
 ## 🚀 Run
 
 ```bash
+# local
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 python main.py
 open http://localhost:8000/docs
+
+# docker related
+docker build --platform linux/amd64 -t yonghaolin/donor-registry-service:latest .
+docker push yonghaolin/donor-registry-service:latest
+
+# cloud run
+gcloud run deploy donor-registry-service \
+  --image docker.io/yonghaolin/donor-registry-service:latest \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --add-cloudsql-instances cloud-computing-478420:us-central1:donor-db \
+  --set-env-vars DATABASE_URL="mysql+pymysql://root:yl5763@/donor_registry?unix_socket=/cloudsql/cloud-computing-478420:us-central1:donor-db"
 ```
 
 ---
