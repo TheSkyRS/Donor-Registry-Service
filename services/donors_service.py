@@ -12,7 +12,7 @@ from models.enums import BloodType, CommonStatus
 from db.models import DonorORM
 
 
-def _split_full_name(full_name: str) -> tuple[str, str]:
+def _split_full_name(full_name: str) -> Tuple[str, str]:
     """
     "Alice Lee" -> ("Alice", "Lee")
     "Prince" -> ("Prince", "")
@@ -76,7 +76,7 @@ class DonorService:
         name: Optional[str] = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> tuple[List[DonorRead], int]:
+    ) -> Tuple[List[DonorRead], int]:
         q = self.db.query(DonorORM)
 
         if blood_type is not None:
