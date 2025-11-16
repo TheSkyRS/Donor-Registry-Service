@@ -268,6 +268,6 @@ curl -i http://localhost:8000/donors
 
 ---
 
-## 🗺 Roadmap (Sprint 3 / Composite Service)
+## 🗺 Roadmap (Sprint 3)
 
 - TODO
