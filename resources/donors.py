@@ -162,12 +162,13 @@ async def get_donor(
         raise HTTPException(status_code=404, detail="Donor not found")
 
     etag = make_etag(donor)
-    response.headers["ETag"] = etag
 
     if if_none_match == etag:
-        response.status_code = status.HTTP_304_NOT_MODIFIED
-        return
-
+        return Response(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            headers={"ETag": etag},
+        )
+    response.headers["ETag"] = etag
     return donor
 
 
