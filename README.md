@@ -13,13 +13,6 @@ Sprint 1 delivered full API stubs (HTTP 501, OpenAPI ready).
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# Required MySQL environment variables
-export MYSQL_HOST=127.0.0.1
-export MYSQL_PORT=3306
-export MYSQL_USER=cc
-export MYSQL_PASSWORD=cc
-export MYSQL_DB=donor_registry
-
 python main.py
 open http://localhost:8000/docs
 ```
