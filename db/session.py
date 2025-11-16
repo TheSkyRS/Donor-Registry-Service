@@ -1,0 +1,10 @@
+# get_db() FastAPI dependency
+# db/session.py
+from db.base import SessionLocal
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
