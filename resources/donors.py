@@ -262,6 +262,7 @@ async def list_organs_for_donor(
 async def create_organ_for_donor(
     donor_id: UUID,
     o: OrganCreate,
+    response: Response,
     service: OrganService = Depends(get_organ_service),
 ):
     """
@@ -274,6 +275,7 @@ async def create_organ_for_donor(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Donor {donor_id} not found",
         )
+    response.headers["Location"] = f"/organs/{created.id}"
     return created
 
 
@@ -305,6 +307,7 @@ async def list_consents_for_donor(
 async def create_consent_for_donor(
     donor_id: UUID,
     c: ConsentCreate,
+    response: Response,
     service: ConsentService = Depends(get_consent_service),
 ):
     """
@@ -317,5 +320,6 @@ async def create_consent_for_donor(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Donor {donor_id} not found",
         )
+    response.headers["Location"] = f"/consents/{created.id}"
     return created
 
