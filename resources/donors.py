@@ -311,7 +311,7 @@ async def create_consent_for_donor(
     Create a new consent record for a donor.
     """
     try:
-        created = service.create_for_donor(donor_id, c)
+        created = service.create_consent_for_donor(donor_id, c)
     except ConsentDonorNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
