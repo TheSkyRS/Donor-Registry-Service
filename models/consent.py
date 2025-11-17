@@ -7,7 +7,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from .enums import ConsentStatus
+from .enums import ConsentStatus, OrganType
 
 
 class ConsentBase(BaseModel):
@@ -15,12 +15,11 @@ class ConsentBase(BaseModel):
     Shared fields for Consent models.
     Represents a donor's authorization to donate organs (scope + status).
     """
-    scope: str = Field(
+    scope: list[OrganType] = Field(
         ...,
         min_length=1,
-        max_length=200,
-        description='Consent scope, e.g. "all organs" or a specific list.',
-        json_schema_extra={"example": "all organs"},
+        description="List of organs the donor authorizes for donation (must contain at least one organ).",
+        json_schema_extra={"example": ["kidney", "liver"]},
     )
     status: ConsentStatus = Field(
         default=ConsentStatus.PENDING,
@@ -42,7 +41,7 @@ class ConsentBase(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "scope": "all organs",
+                    "scope": ["kidney", "liver"],
                     "status": "granted",
                     "signed_at": "2025-02-10T09:15:00Z",
                     "revoked_at": None,
@@ -62,7 +61,7 @@ class ConsentCreate(ConsentBase):
         "json_schema_extra": {
             "examples": [
                 {
-                    "scope": "kidney, liver",
+                    "scope": ["kidney", "liver"],
                     "status": "pending",
                     "signed_at": None,
                     "revoked_at": None,
@@ -105,7 +104,7 @@ class ConsentUpdate(BaseModel):
             "examples": [
                 {"status": "granted", "signed_at": "2025-02-10T09:15:00Z"},
                 {"status": "revoked", "revoked_at": "2025-03-01T12:00:00Z"},
-                {"scope": "all organs"},
+                {"scope": ["kidney", "liver"]},
             ]
         }
     }
@@ -143,7 +142,7 @@ class ConsentRead(ConsentBase):
                 {
                     "id": "2a4b01f7-5f5e-4a0a-8e0c-1a2b3c4d5e6f",
                     "donor_id": "7f1d69a7-b8d2-4e75-9c1c-6f1e6b2a9d77",
-                    "scope": "all organs",
+                    "scope": ["kidney", "liver"],
                     "status": "granted",
                     "signed_at": "2025-02-10T09:15:00Z",
                     "revoked_at": None,

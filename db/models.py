@@ -7,7 +7,7 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
-    Text,
+    JSON,
 )
 from sqlalchemy.dialects.mysql import CHAR
 from sqlalchemy.orm import relationship
@@ -73,7 +73,7 @@ class ConsentORM(Base):
     id = Column(CHAR(36), primary_key=True, default=lambda: str(uuid4()))
     donor_id = Column(CHAR(36), ForeignKey("donors.id"), nullable=False)
 
-    scope = Column(String(200), nullable=False)
+    scope = Column(JSON, nullable=False)  # stores list of OrganType values as strings
     status = Column(Enum(ConsentStatus), nullable=False, default=ConsentStatus.PENDING)
     signed_at = Column(DateTime, nullable=True)
     revoked_at = Column(DateTime, nullable=True)
