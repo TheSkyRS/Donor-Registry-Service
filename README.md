@@ -323,23 +323,6 @@ If mismatched:
 
 ---
 
-## 🧪 Development Tips
-
-Hot reload:
-
-```bash
-uvicorn main:app --reload
-```
-
-Smoke tests:
-
-```bash
-curl -i http://localhost:8000/health
-curl -i http://localhost:8000/donors
-```
-
----
-
 ## 🗺 Roadmap (Sprint 3)
 
 - TODO
