@@ -43,14 +43,79 @@ This repository implements **Microservice 1: Donor Registry**, one of three serv
 | [**MS2 – Recipient Waitlist**](https://github.com/zl3508/recipient-waitlist-service) | Recipient/Hospital/Need |
 | [**MS3 – Organ Matching & Notification**](https://github.com/AyalYakobe/matchmaking_and_notifications_serivce) | API‑first with Swagger |
 
-### Typical Flow
+### Typical Flow (Realistic Donor → Consent → Organ Lifecycle)
 
-1. A **Donor** is registered in the system.  
-2. The Donor’s available **Organs** are recorded.  
-3. The Donor’s **Consent** for donation is captured.  
-4. The **Organ Matching Service (MS3)** uses this data to perform **organ matching** with recipient needs from **MS2**.
+This project models the full lifecycle of organ donation data inside MS1, from a
+living donor creating advance directives to post-mortem consent validation and
+organ retrieval. The system enforces clear, auditable states for donors,
+consents, and organs.
 
-MS1 acts as the **authoritative donor database** for the entire system.
+1. **A living donor registers in the system.**  
+   - Donor is created with `status = inactive` meaning “alive”.  
+   - No organs or consents exist yet.
+
+2. **The donor creates a consent document (advance directive).**  
+   - Consent contains a list of organs the donor is willing to donate:
+     ```json
+     ["kidney", "liver"]
+     ```
+   - `status = pending` (default).  
+   - `signed_at = null`, `revoked_at = null`.
+
+3. **The donor explicitly signs the consent.**  
+   - System records `signed_at = timestamp`.  
+   - Status remains `pending` (signing ≠ granting).  
+   - Donor may sign but later change their mind.
+
+4. **A living donor may revoke consent at any time.**  
+   - System sets `revoked_at = timestamp`.  
+   - Status becomes `revoked`.  
+   - If the donor later decides to donate again, they must create a **new** consent.
+
+5. **Pending consents require system verification.**  
+   - While the donor is alive, the consent stays `pending`.  
+   - No organ can be retrieved, and no organ record exists yet.
+
+6. **When the donor dies (`status = active`), the system evaluates their consent.**  
+   - Donor status changes to `active` to represent **post-mortem availability**.  
+   - The latest non-revoked pending consent is evaluated:
+     - If donor’s body/organs are viable → `status = granted`
+     - If organs are not usable → `status = revoked`  
+   - This ensures the donor’s final intent is respected.
+
+7. **When a consent becomes `granted`, organs are retrieved.**  
+   - For each organ listed in the consent’s `scope`, the system creates an Organ record:
+     - `organ_type`
+     - `condition`
+     - `retrieved_at`
+   - Example:
+     ```json
+     {
+       "organ_type": "kidney",
+       "condition": "viable",
+       "retrieved_at": "2025-01-15T08:30:00Z"
+     }
+     ```
+
+8. **MS2 (Recipient Waitlist) issues needs, and MS3 performs matching.**  
+   - Each `Need` in MS2 represents **one specific organ** required for a recipient.  
+   - MS3 matches MS1 organs to MS2 needs:
+     - Organ must belong to a **deceased donor** (`status = active`)
+     - Consent must be **granted**
+     - Organ type must appear in the consent’s `scope`
+
+9. **A successful match consumes the organ.**  
+   - MS3 deletes:
+     - the matched `Need` (MS2)
+     - the used Organ record (MS1)  
+   - Prevents double-use of the same organ.
+
+This workflow ensures:
+- Donor autonomy is fully respected  
+- Consents are auditable and versioned  
+- Organs cannot be retrieved without a granted consent  
+- MS3 can safely and deterministically match organs to recipient needs
+
 
 ---
 
@@ -249,7 +314,7 @@ If mismatched:
 |---------------|----------------|
 | id            | UUID           |
 | donor_id      | FK(donors.id)  |
-| scope         | varchar(200)   |
+| scope         | JSON           |
 | status        | enum           |
 | signed_at     | datetime       |
 | revoked_at    | datetime       |
