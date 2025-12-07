@@ -265,12 +265,14 @@ Example response:
 
 Optimistic concurrency for donors:
 
+ETags are derived from the entire donor payload, so any field change yields a new value.
+
 ```http
 GET /donors/{id}
-ETag: W/"<sha256>"
+ETag: "<sha256>"
 
 PUT /donors/{id}
-If-Match: W/"<sha256>"
+If-Match: "<sha256>"
 ```
 
 If mismatched:

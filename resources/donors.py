@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from uuid import UUID
 import hashlib
+import json
 from urllib.parse import urlencode
 
 from fastapi import (
@@ -53,11 +54,12 @@ def get_consent_service(db: Session = Depends(get_db)) -> ConsentService:
 
 def make_etag(donor: DonorRead) -> str:
     """
-    use donor.id + donor.updated_at to generate 'weak' ETag
+    Generate a strong ETag using every serialized field on the donor.
     """
-    raw = f"{donor.id}:{donor.updated_at.isoformat()}".encode("utf-8")
-    digest = hashlib.sha256(raw).hexdigest()
-    return f'W/"{digest}"'
+    donor_payload = donor.model_dump(mode="json")
+    serialized = json.dumps(donor_payload, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+    return f'"{digest}"'
 
 
 # ----------------------
@@ -322,4 +324,3 @@ async def create_consent_for_donor(
         )
     response.headers["Location"] = f"/consents/{created.id}"
     return created
-
