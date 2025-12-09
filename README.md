@@ -172,7 +172,7 @@ This workflow ensures:
 - ✅ SQLAlchemy persistence (MySQL)
 - ✅ Actual CRUD for donors, organs, consents
 - ✅ Async FastAPI endpoints
-- ✅ Clean domain error → HTTP translation
+- ✅ Query parameters for all collection resources.
 - ✅ Linked data / HATEOAS-style `_links`
 - ✅ Pagination for all top-level resources
 - ✅ Correct `201 Created` + `Location` headers
@@ -253,7 +253,7 @@ Example response:
 }
 ```
 
-### 🔍 Filtering Examples
+### 🔍 Query parameters - Filtering Examples
 
 ```bash
 /donors?name=bob&status=active
