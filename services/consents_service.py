@@ -7,7 +7,7 @@ from uuid import UUID, uuid4
 from sqlalchemy.orm import Session
 
 from models import ConsentCreate, ConsentRead, ConsentUpdate
-from models.enums import ConsentStatus
+from models.enums import ConsentStatus, OrganType
 from db.models import ConsentORM, DonorORM
 
 
@@ -133,10 +133,26 @@ class ConsentService:
     # ORM -> Pydantic
     # ---------------------------
     def _to_read_model(self, obj: ConsentORM) -> ConsentRead:
+        raw_scope = obj.scope
+
+        # may be old data (not correct format)
+        if isinstance(raw_scope, str):
+            # wrong  "kidney, liver"
+            raw_list = [s.strip() for s in raw_scope.split(",") if s.strip()]
+        elif isinstance(raw_scope, list):
+            raw_list = raw_scope
+        else:
+            raw_list = []
+
+        try:
+            scopes = [OrganType(s) for s in raw_list]
+        except Exception as e:
+            raise
+
         data = {
             "id": UUID(obj.id),
             "donor_id": UUID(obj.donor_id),
-            "scope": obj.scope,
+            "scope": scopes,             # list[OrganType]
             "status": obj.status,
             "signed_at": obj.signed_at,
             "revoked_at": obj.revoked_at,

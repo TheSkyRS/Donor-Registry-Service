@@ -76,12 +76,11 @@ class ConsentUpdate(BaseModel):
     Partial update payload; Consent ID comes from the path.
     All fields are optional.
     """
-    scope: Optional[str] = Field(
+    scope: Optional[list[OrganType]] = Field(
         None,
         min_length=1,
-        max_length=200,
-        description='Consent scope, e.g. "all organs" or a specific list.',
-        json_schema_extra={"example": "kidney, liver"},
+        description="List of organs the donor authorizes for donation (must contain at least one organ).",
+        json_schema_extra={"example": ["kidney", "liver"]},
     )
     status: Optional[ConsentStatus] = Field(
         None,
